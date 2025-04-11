@@ -33,6 +33,7 @@ void Game::Render()
 	BeginDrawing();
 	ClearBackground(WHITE);
 
+	m_level->Draw();
 	m_player->Draw();
 
 	EndDrawing();

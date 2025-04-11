@@ -42,8 +42,7 @@ void Player::Update(float deltaTime)
 		SetAnimationState(AnimationAtlasMapper::Jump);
 	}
 
-	//
-	if (IsKeyDown(KEY_A) && m_position.x - m_frameWidth * GetLeftFacingHitboxOffset() > 0)
+	if (IsKeyDown(KEY_A) && m_position.x - GetLeftFacingHitboxOffset() > 0)
 	{
 		m_position.x -= m_moveSpeed * deltaTime;
 		m_facingRight = false;
@@ -144,7 +143,7 @@ void Player::Draw()
 // This offset is used to adjust the sprite's position when facing left to ensure it aligns properly with the left screen edge.
 float Player::GetLeftFacingHitboxOffset()
 {
-	return SCALE - (SCALE - 1.0f) * (m_frameWidth / 2) / m_frameWidth * 0.2;
+	return m_frameWidth * (SCALE - (SCALE - 1.0f) * (m_frameWidth / 2) / m_frameWidth * 0.2);
 }
 
 void Player::SetAnimationState(AnimationAtlasMapper newState)

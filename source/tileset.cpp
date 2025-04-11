@@ -6,6 +6,7 @@ Tileset::Tileset(const std::string& filePath, int tileWidth, int tileHeight)
 	if (m_tileset.id == 0)
 	{
 		std::cerr << "ERROR: failed to load tile set texture atlas";
+		std::exit(1);
 	}
 }
 
