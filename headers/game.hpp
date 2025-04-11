@@ -8,6 +8,7 @@
 #include "tileset.hpp"
 #include "level.hpp"
 #include "player.hpp"
+#include "hitbox.hpp"
 
 class Game
 {
@@ -17,6 +18,10 @@ public:
 	void Run();
 
 	void Update();
+
+	void HandleInput(float deltaTime);
+
+	void CheckForCollisions();
 
 	void Render();
 

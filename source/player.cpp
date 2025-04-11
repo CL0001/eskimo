@@ -3,15 +3,15 @@
 Player::Player()
 	: m_position({ static_cast<float>(GetScreenWidth() / 2), static_cast<float>(GetScreenHeight() / 2) }),
 	m_spriteAnimationAtlas(LoadTexture((std::string(RESOURCES_PATH) + "sprites/Eskimo/Animations.png").c_str())),
-	m_currentAnimationState(AnimationAtlasMapper::Idle)
+	m_currentAnimationState(AnimationAtlasMapper::Idle),
+	m_frameWidth(m_spriteAnimationAtlas.width / m_totalFrames),
+	m_frameHeight(m_spriteAnimationAtlas.height / 9),
+	m_hitbox(m_position, m_frameWidth, m_frameHeight)
 {
 	if (m_spriteAnimationAtlas.id == 0) {
 		std::cerr << "ERROR: Failed to load player texture atlas.\n";
 		std::exit(1);
 	}
-
-	m_frameWidth = m_spriteAnimationAtlas.width / m_totalFrames;
-	m_frameHeight = m_spriteAnimationAtlas.height / 9;
 }
 
 Player::~Player() {
@@ -20,54 +20,7 @@ Player::~Player() {
 
 void Player::Update(float deltaTime)
 {
-	m_velocityY += m_gravity * deltaTime;
-	m_position.y += m_velocityY * deltaTime;
-
-	if (m_position.y + m_frameHeight >= GetScreenHeight())
-	{
-		m_position.y = GetScreenHeight() - m_frameHeight;
-		m_velocityY = 0.0f;
-		m_isOnGround = true;
-	}
-	else
-	{
-		m_isOnGround = false;
-	}
-
-	if ((IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_W)) && m_isOnGround)
-	{
-		m_velocityY = m_jumpStrength;
-		m_isOnGround = false;
-
-		SetAnimationState(AnimationAtlasMapper::Jump);
-	}
-
-	if (IsKeyDown(KEY_A) && m_position.x - GetLeftFacingHitboxOffset() > 0)
-	{
-		m_position.x -= m_moveSpeed * deltaTime;
-		m_facingRight = false;
-
-		if (m_isOnGround)
-		{
-			SetAnimationState(AnimationAtlasMapper::Walk);
-		}
-	}
-
-	if (IsKeyDown(KEY_D) && m_position.x + m_frameWidth < GetScreenWidth())
-	{
-		m_position.x += m_moveSpeed * deltaTime;
-		m_facingRight = true;
-
-		if (m_isOnGround)
-		{
-			SetAnimationState(AnimationAtlasMapper::Walk);
-		}
-	}
-
-	if (!IsKeyDown(KEY_A) && !IsKeyDown(KEY_D) && m_isOnGround)
-	{
-		SetAnimationState(AnimationAtlasMapper::Idle);
-	}
+	m_hitbox.Update(m_position, m_frameWidth, m_frameHeight);
 
 	m_animationTimer += deltaTime;
 	if (m_animationTimer >= m_frameTime)
@@ -120,30 +73,74 @@ void Player::Draw()
 	);
 }
 
-// This function calculates the offset for the hitbox of the player's sprite when it is facing left (mirrored).
-// It ensures that the left edge of the sprite aligns correctly with the screen boundary without stopping prematurely.
-// This is important for ensuring the player character doesn't move outside the left edge of the screen when facing left.
-//
-// The calculation accounts for:
-// - The scaling factor (SCALE), which affects the size of the sprite.
-// - The width of the sprite frame (m_frameWidth), which determines how much space the sprite occupies on the screen.
-// - The offset required when the sprite is facing left (mirrored), ensuring the sprite's left edge is correctly aligned.
-//
-// The factor of 0.2 is an adjustment value that was experimentally determined to compensate for the mirrored effect,
-// ensuring a visually correct offset for the character's movement when facing left.
-//
-// Example Calculation:
-// Given SCALE = 4.0, m_frameWidth = 16:
-// 1. SCALE - 1.0f = 4.0 - 1.0 = 3.0
-// 2. m_frameWidth / 2 = 16 / 2 = 8
-// 3. (m_frameWidth / 2) / m_frameWidth = 8 / 16 = 0.5
-// 4. Multiply by 0.2: 3.0 * 0.5 * 0.2 = 0.3
-// The final result is 0.3, which is the offset that compensates for the mirrored sprite.
-//
-// This offset is used to adjust the sprite's position when facing left to ensure it aligns properly with the left screen edge.
-float Player::GetLeftFacingHitboxOffset()
+Vector2 Player::GetPosition() const
 {
-	return m_frameWidth * (SCALE - (SCALE - 1.0f) * (m_frameWidth / 2) / m_frameWidth * 0.2);
+	return m_position;
+}
+
+float Player::GetVerticalVelocity() const
+{
+	return m_verticalVelocity;
+}
+
+float Player::GetGravity() const
+{
+	return m_gravity;
+}
+
+float Player::GetFrameWidth() const
+{
+	return m_frameWidth;
+}
+
+float Player::GetFrameHeight() const
+{
+	return m_frameHeight;
+}
+
+bool Player::GetIsOnGround() const
+{
+	return m_isOnGround;
+}
+
+float Player::GetJumpStrength() const
+{
+	return m_jumpStrength;
+}
+
+float Player::GetMoveSpeed() const
+{
+	return m_moveSpeed;
+}
+
+Hitbox Player::GetHitbox() const
+{
+	return m_hitbox;
+}
+
+bool Player::GetIsFacingRight() const
+{
+	return m_facingRight;
+}
+
+void Player::SetPosition(Vector2 position)
+{
+	m_position = position;
+}
+
+void Player::SetVerticalVelocity(float velocity)
+{
+	m_verticalVelocity = velocity;
+}
+
+void Player::SetIsOnGround(bool isOnGround)
+{
+	m_isOnGround = isOnGround;
+}
+
+void Player::SetIsFacingRight(bool isFacingRight)
+{
+	m_facingRight = isFacingRight;
 }
 
 void Player::SetAnimationState(AnimationAtlasMapper newState)

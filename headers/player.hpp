@@ -7,6 +7,7 @@
 #include "rlImGui.h"
 
 #include "config.hpp"
+#include "hitbox.hpp"
 
 enum AnimationAtlasMapper {
 	Attack = 0,
@@ -27,15 +28,29 @@ public:
 	~Player();
 
 	void Update(float deltaTime);
+
 	void Draw();
 
-	// The left edge offset caused by scaling and mirroring
-	float GetLeftFacingHitboxOffset();
+	Vector2 GetPosition() const;
+	float GetVerticalVelocity() const;
+	float GetGravity() const;
+	float GetFrameWidth() const;
+	float GetFrameHeight() const;
+	bool GetIsOnGround() const;
+	float GetJumpStrength() const;
+	float GetMoveSpeed() const;
+	Hitbox GetHitbox() const;
+	bool GetIsFacingRight() const;
+
+	void SetPosition(Vector2 position);
+	void SetVerticalVelocity(float velocity);
+	void SetIsOnGround(bool isOnGround);
+	void SetIsFacingRight(bool isFacingRight);
 	void SetAnimationState(AnimationAtlasMapper newState);
 
 private:
 	Vector2 m_position;
-	float m_velocityY = 0;
+	float m_verticalVelocity = 0;
 	bool m_isOnGround = false;
 
 	const float m_gravity = 1500.0f;
@@ -53,5 +68,6 @@ private:
 	int m_frameWidth;
 	int m_frameHeight;
 
+	Hitbox m_hitbox;
 	bool m_facingRight = true;
 };
