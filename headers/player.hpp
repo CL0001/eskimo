@@ -28,6 +28,9 @@ public:
 
 	void Update(float deltaTime);
 	void Draw();
+
+	// The left edge offset caused by scaling and mirroring
+	float GetLeftFacingHitboxOffset();
 	void SetAnimationState(AnimationAtlasMapper newState);
 
 private:

@@ -42,7 +42,8 @@ void Player::Update(float deltaTime)
 		SetAnimationState(AnimationAtlasMapper::Jump);
 	}
 
-	if (IsKeyDown(KEY_A) && m_position.x > 0)
+	//
+	if (IsKeyDown(KEY_A) && m_position.x - m_frameWidth * GetLeftFacingHitboxOffset() > 0)
 	{
 		m_position.x -= m_moveSpeed * deltaTime;
 		m_facingRight = false;
@@ -118,6 +119,32 @@ void Player::Draw()
 		0.0f,
 		WHITE
 	);
+}
+
+// This function calculates the offset for the hitbox of the player's sprite when it is facing left (mirrored).
+// It ensures that the left edge of the sprite aligns correctly with the screen boundary without stopping prematurely.
+// This is important for ensuring the player character doesn't move outside the left edge of the screen when facing left.
+//
+// The calculation accounts for:
+// - The scaling factor (SCALE), which affects the size of the sprite.
+// - The width of the sprite frame (m_frameWidth), which determines how much space the sprite occupies on the screen.
+// - The offset required when the sprite is facing left (mirrored), ensuring the sprite's left edge is correctly aligned.
+//
+// The factor of 0.2 is an adjustment value that was experimentally determined to compensate for the mirrored effect,
+// ensuring a visually correct offset for the character's movement when facing left.
+//
+// Example Calculation:
+// Given SCALE = 4.0, m_frameWidth = 16:
+// 1. SCALE - 1.0f = 4.0 - 1.0 = 3.0
+// 2. m_frameWidth / 2 = 16 / 2 = 8
+// 3. (m_frameWidth / 2) / m_frameWidth = 8 / 16 = 0.5
+// 4. Multiply by 0.2: 3.0 * 0.5 * 0.2 = 0.3
+// The final result is 0.3, which is the offset that compensates for the mirrored sprite.
+//
+// This offset is used to adjust the sprite's position when facing left to ensure it aligns properly with the left screen edge.
+float Player::GetLeftFacingHitboxOffset()
+{
+	return SCALE - (SCALE - 1.0f) * (m_frameWidth / 2) / m_frameWidth * 0.2;
 }
 
 void Player::SetAnimationState(AnimationAtlasMapper newState)
