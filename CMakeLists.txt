@@ -10,7 +10,7 @@ add_subdirectory("${CMAKE_SOURCE_DIR}/third_party/raylib")
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/source/*.cpp")
 
-add_executable(${PROJECT_NAME} ${SOURCES} "source/hitbox.cpp" "source/input.cpp")
+add_executable(${PROJECT_NAME} ${SOURCES} "source/hitbox.cpp" )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     "${CMAKE_SOURCE_DIR}/headers"

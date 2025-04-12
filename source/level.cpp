@@ -3,7 +3,8 @@
 Level::Level(const std::string& filePath, std::shared_ptr<Tileset> tileset, std::shared_ptr<Player> player)
 	: m_filePath(filePath), m_tileset(tileset), m_player(player)
 {
-	m_obstacleLayout.emplace_back(m_tileset, Vector2{ 6, 1 }, Vector2{ GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f + 200});
+	m_obstacleLayout.emplace_back(m_tileset, Vector2{ 6, 1 }, Vector2{ GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f + 300});
+	m_obstacleLayout.emplace_back(m_tileset, Vector2{ 6, 1 }, Vector2{ GetScreenWidth() / 2.0f + 16 * SCALE, GetScreenHeight() / 2.0f + 300 });
 }
 
 void Level::Update(const float deltaTime)
