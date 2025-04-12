@@ -4,7 +4,7 @@ Player::Player()
 	: m_position({ static_cast<float>(GetScreenWidth() / 2), static_cast<float>(GetScreenHeight() / 2) }),
 	m_spriteAnimationAtlas(LoadTexture((std::string(RESOURCES_PATH) + "sprites/Eskimo/Animations.png").c_str())),
 	m_currentAnimationState(AnimationAtlasMapper::Idle),
-	m_frameWidth(m_spriteAnimationAtlas.width / m_totalFrames),
+	m_frameWidth(m_spriteAnimationAtlas.width / ANIMATION_FRAME_COUNT),
 	m_frameHeight(m_spriteAnimationAtlas.height / 9),
 	m_hitbox(m_position, m_frameWidth, m_frameHeight)
 {
@@ -22,11 +22,75 @@ void Player::Update(float deltaTime)
 {
 	m_hitbox.Update(m_position, m_frameWidth, m_frameHeight);
 
+	ApplyGravity(deltaTime);
+
+	CheckGroundCollision();
+
+	UpdateAnimationFrame(deltaTime);
+}
+
+void Player::Idle()
+{
+	if (m_isOnGround)
+		SetAnimationState(AnimationAtlasMapper::Idle);
+}
+
+void Player::MoveLeft(const float deltaTime)
+{
+	if (m_isOnGround)
+		SetAnimationState(AnimationAtlasMapper::Walk);
+
+	m_position.x -= BASE_MOVE_SPEED * deltaTime;
+	m_facingRight = false;
+}
+
+void Player::MoveRight(const float deltaTime)
+{
+	if (m_isOnGround)
+		SetAnimationState(AnimationAtlasMapper::Walk);
+
+	m_position.x += BASE_MOVE_SPEED * deltaTime;
+	m_facingRight = true;
+}
+
+void Player::Jump(const float deltaTime)
+{
+	if (!m_isOnGround)
+		return;
+
+	m_verticalVelocity = BASE_JUMP_STRENGTH;
+	m_isOnGround = false;
+
+	SetAnimationState(AnimationAtlasMapper::Jump);
+}
+
+void Player::ApplyGravity(const float deltaTime)
+{
+	m_verticalVelocity += BASE_GRAVITY * deltaTime;
+	m_position.y += m_verticalVelocity * deltaTime;
+}
+
+void Player::CheckGroundCollision()
+{
+	if (m_position.y + m_frameHeight >= GetScreenHeight())
+	{
+		m_position.y = GetScreenHeight() - m_frameHeight;
+		m_verticalVelocity = 0.0f;
+		m_isOnGround = true;
+	}
+	else
+	{
+		m_isOnGround = false;
+	}
+}
+
+void Player::UpdateAnimationFrame(const float deltaTime)
+{
 	m_animationTimer += deltaTime;
-	if (m_animationTimer >= m_frameTime)
+	if (m_animationTimer >= ANIMATION_FRAME_TIME)
 	{
 		m_currentFrame++;
-		if (m_currentFrame >= m_totalFrames)
+		if (m_currentFrame >= ANIMATION_FRAME_COUNT)
 		{
 			m_currentFrame = 0;
 		}
@@ -71,76 +135,6 @@ void Player::Draw()
 		0.0f,
 		WHITE
 	);
-}
-
-Vector2 Player::GetPosition() const
-{
-	return m_position;
-}
-
-float Player::GetVerticalVelocity() const
-{
-	return m_verticalVelocity;
-}
-
-float Player::GetGravity() const
-{
-	return m_gravity;
-}
-
-float Player::GetFrameWidth() const
-{
-	return m_frameWidth;
-}
-
-float Player::GetFrameHeight() const
-{
-	return m_frameHeight;
-}
-
-bool Player::GetIsOnGround() const
-{
-	return m_isOnGround;
-}
-
-float Player::GetJumpStrength() const
-{
-	return m_jumpStrength;
-}
-
-float Player::GetMoveSpeed() const
-{
-	return m_moveSpeed;
-}
-
-Hitbox Player::GetHitbox() const
-{
-	return m_hitbox;
-}
-
-bool Player::GetIsFacingRight() const
-{
-	return m_facingRight;
-}
-
-void Player::SetPosition(Vector2 position)
-{
-	m_position = position;
-}
-
-void Player::SetVerticalVelocity(float velocity)
-{
-	m_verticalVelocity = velocity;
-}
-
-void Player::SetIsOnGround(bool isOnGround)
-{
-	m_isOnGround = isOnGround;
-}
-
-void Player::SetIsFacingRight(bool isFacingRight)
-{
-	m_facingRight = isFacingRight;
 }
 
 void Player::SetAnimationState(AnimationAtlasMapper newState)

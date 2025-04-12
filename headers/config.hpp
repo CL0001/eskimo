@@ -1,3 +1,10 @@
 #pragma once
 
 #define SCALE 4.0f
+
+#define BASE_GRAVITY 1500.0f
+#define BASE_JUMP_STRENGTH -600.0f
+#define BASE_MOVE_SPEED 300.0f
+
+#define ANIMATION_FRAME_COUNT 4
+#define ANIMATION_FRAME_TIME 0.1f

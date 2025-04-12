@@ -19,10 +19,6 @@ public:
 
 	void Update();
 
-	void HandleInput(float deltaTime);
-
-	void CheckForCollisions();
-
 	void Render();
 
 private:
@@ -30,6 +26,6 @@ private:
 	const int m_windowHeight = 720;
 
 	std::shared_ptr<Tileset> m_tileset;
+	std::shared_ptr<Player> m_player;
 	std::unique_ptr<Level> m_level;
-	std::unique_ptr<Player> m_player;
 };
