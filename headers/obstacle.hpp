@@ -22,5 +22,5 @@ private:
 	std::shared_ptr<Tileset> m_tileset;
 	Vector2 m_tilesetPosition;
 	Vector2 m_position;
-	Hitbox m_hitbox;
+	Hitbox m_hitbox{};
 };

@@ -13,8 +13,8 @@ void Obstacle::Draw()
 	);
 
 	Rectangle destinationRectangle = {
-		m_position.x,
-		m_position.y,
+		m_position.x * TILE_SIZE * SCALE,
+		m_position.y * TILE_SIZE * SCALE,
 		sourceRectangle.width * SCALE,
 		sourceRectangle.height * SCALE
 	};
