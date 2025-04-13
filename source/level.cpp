@@ -1,10 +1,24 @@
 #include "level.hpp"
 
+#include <fstream>
+
+#include "json.hpp"
+
+using json = nlohmann::json;
+
 Level::Level(const std::string& filePath, std::shared_ptr<Tileset> tileset, std::shared_ptr<Player> player)
 	: m_filePath(filePath), m_tileset(tileset), m_player(player)
 {
-	m_obstacleLayout.emplace_back(m_tileset, Vector2{ 6, 1 }, Vector2{ 0, 0 });
-	m_obstacleLayout.emplace_back(m_tileset, Vector2{ 3, 1 }, Vector2{ 0, 1 });
+	Build();
+}
+
+void Level::Build()
+{
+	std::ifstream levelFile((std::string(RESOURCES_PATH) + "levels/test.json"));
+	json levelData = json::parse(levelFile);
+
+	for (const auto& obstacle : levelData["ObstacleLayout"])
+		m_obstacleLayout.emplace_back(m_tileset, Vector2{ obstacle["TilesetPosition"]["x"], obstacle["TilesetPosition"]["y"] }, Vector2{ obstacle["GamePosition"]["x"], obstacle["GamePosition"]["y"] });
 }
 
 void Level::Update(const float deltaTime)

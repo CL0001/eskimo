@@ -16,6 +16,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     "${CMAKE_SOURCE_DIR}/headers"
     "${CMAKE_SOURCE_DIR}/third_party/raylib/src"
     "${CMAKE_SOURCE_DIR}/third_party/iamgui"
+    "${CMAKE_SOURCE_DIR}/third_party/json"
 )
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC RESOURCES_PATH="${CMAKE_SOURCE_DIR}/assets/")

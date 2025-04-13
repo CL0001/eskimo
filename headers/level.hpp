@@ -17,6 +17,8 @@ public:
 	Level(const std::string& filePath, std::shared_ptr<Tileset> tileset, std::shared_ptr<Player> player);
 	~Level() = default;
 
+	void Build();
+
 	void Update(const float deltaTime);
 
 	void HandlePlayerInput(const float deltaTime);
