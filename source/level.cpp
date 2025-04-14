@@ -1,9 +1,11 @@
 #include "level.hpp"
 
+#include <iostream>
 #include <fstream>
 
-#include "json.hpp"
+#include "collision_direction.hpp"
 
+#include "json.hpp"
 using json = nlohmann::json;
 
 Level::Level(const std::string& filePath, std::shared_ptr<Tileset> tileset, std::shared_ptr<Player> player)

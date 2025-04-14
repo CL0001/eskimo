@@ -1,7 +1,9 @@
 #include "obstacle.hpp"
 
+#include "config.hpp"
+
 Obstacle::Obstacle(std::shared_ptr<Tileset> tileset, Vector2 tilesetPosition, Vector2 position)
-	: m_tileset(tileset), m_tilesetPosition(tilesetPosition), m_position(position), m_hitbox(m_position, TILE_SIZE, TILE_SIZE)
+	: m_tileset(tileset), m_tilesetPosition(tilesetPosition), m_position(position), m_hitbox(m_position.x, m_position.y, TILE_SIZE, TILE_SIZE)
 {
 }
 
@@ -21,8 +23,6 @@ void Obstacle::Draw()
 
 	Vector2 origin = { 0.0f, 0.0f };
 
-	m_hitbox = Hitbox(m_position, destinationRectangle.width, destinationRectangle.height);
-
 	DrawTexturePro(
 		m_tileset->GetTileset(),
 		sourceRectangle,
@@ -33,7 +33,7 @@ void Obstacle::Draw()
 	);
 }
 
-Hitbox Obstacle::GetHitbox() const
+Rectangle Obstacle::GetHitbox() const
 {
 	return m_hitbox;
 }

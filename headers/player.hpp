@@ -1,15 +1,10 @@
 #pragma once
 
-#include <iostream>
-#include <unordered_map>
-#include <string>
-
 #include "rlImGui.h"
 
-#include "config.hpp"
-#include "hitbox.hpp"
+#include "collision_direction.hpp"
 
-enum AnimationAtlasMapper {
+enum class AnimationAtlasMapper {
 	Attack = 0,
 	Death,
 	Idle,
@@ -27,7 +22,11 @@ public:
 	Player();
 	~Player();
 
-	void Update(float deltaTime);
+	void Update(const float deltaTime);
+
+	void UpdateHitbox();
+	CollisionDirection CheckCollisionWith(const Rectangle& otherHitbox) const;
+	void ResolveCollision(const CollisionDirection& collisionDirection);
 
 	void Idle();
 	void MoveLeft(const float deltaTime);
@@ -35,13 +34,9 @@ public:
 	void Jump(const float deltaTime);
 
 	void ApplyGravity(const float deltaTime);
-	void CheckGroundCollision();
 	void UpdateAnimationFrame(const float deltaTime);
 
 	void Draw();
-
-	CollisionDirection CheckCollisionWith(const Hitbox& otherHitbox) const;
-	void ResolveCollision(const CollisionDirection& collisionDirection);
 
 	void SetAnimationState(AnimationAtlasMapper newState);
 
@@ -57,8 +52,8 @@ private:
 	int m_currentFrame = 0;
 
 	AnimationAtlasMapper m_currentAnimationState;
-	int m_frameWidth;
-	int m_frameHeight;
+	float m_frameWidth;
+	float m_frameHeight;
 
-	Hitbox m_hitbox;
+	Rectangle m_hitbox;
 };

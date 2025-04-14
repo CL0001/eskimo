@@ -1,5 +1,7 @@
 #include "game.hpp"
 
+#include <string>
+
 Game::Game()
 {
 	SetConfigFlags(FLAG_WINDOW_RESIZABLE);

@@ -1,14 +1,12 @@
 #pragma once
 
 #include <memory>
-#include <string>
 
 #include "rlImGui.h"
 
 #include "tileset.hpp"
-#include "level.hpp"
 #include "player.hpp"
-#include "hitbox.hpp"
+#include "level.hpp"
 
 class Game
 {

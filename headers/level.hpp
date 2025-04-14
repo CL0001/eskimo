@@ -3,13 +3,12 @@
 #include <string>
 #include <memory>
 #include <vector>
-#include <iostream>
 
 #include "rlImGui.h"
 
 #include "tileset.hpp"
-#include "obstacle.hpp"
 #include "player.hpp"
+#include "obstacle.hpp"
 
 class Level
 {
