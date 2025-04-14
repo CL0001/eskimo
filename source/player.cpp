@@ -59,7 +59,7 @@ void Player::Jump(const float deltaTime)
 	if (!m_isOnGround)
 		return;
 
-	m_velocity.x = BASE_JUMP_STRENGTH;
+	m_velocity.y = BASE_JUMP_STRENGTH;
 	m_isOnGround = false;
 
 	SetAnimationState(AnimationAtlasMapper::Jump);
@@ -67,8 +67,8 @@ void Player::Jump(const float deltaTime)
 
 void Player::ApplyGravity(const float deltaTime)
 {
-	m_velocity.x += BASE_GRAVITY * deltaTime;
-	m_position.y += m_velocity.x * deltaTime;
+    m_velocity.y += BASE_GRAVITY * deltaTime;
+    m_position.y += m_velocity.y * deltaTime;
 }
 
 void Player::CheckGroundCollision()
@@ -76,7 +76,7 @@ void Player::CheckGroundCollision()
 	if (m_position.y + m_frameHeight >= GetScreenHeight())
 	{
 		m_position.y = GetScreenHeight() - m_frameHeight;
-		m_velocity.x = 0.0f;
+		m_velocity.y = 0.0f;
 		m_isOnGround = true;
 	}
 	else
@@ -140,73 +140,56 @@ void Player::Draw()
 
 CollisionDirection Player::CheckCollisionWith(const Hitbox& otherHitbox) const
 {
-
-	// Log the player's hitbox bounds
-	std::clog << "PLAYER: Left = " << m_hitbox.GetLeftBound()
-		<< ", Top = " << m_hitbox.GetTopBound()
-		<< ", Right = " << m_hitbox.GetRightBound()
-		<< ", Bottom = " << m_hitbox.GetBottomBound()
-		<< std::endl;
-
-	// Log the obstacle's hitbox bounds
-	std::clog << "OBSTACLE: Left = " << otherHitbox.GetLeftBound()
-		<< ", Top = " << otherHitbox.GetTopBound()
-		<< ", Right = " << otherHitbox.GetRightBound()
-		<< ", Bottom = " << otherHitbox.GetBottomBound()
-		<< std::endl;
-
-	bool collisionX = m_hitbox.GetRightBound() > otherHitbox.GetLeftBound() && m_hitbox.GetLeftBound() < otherHitbox.GetRightBound();
-	bool collisionY = m_hitbox.GetBottomBound() > otherHitbox.GetTopBound() && m_hitbox.GetTopBound() < otherHitbox.GetBottomBound();
+	bool collisionX = m_hitbox.GetRightBound() > otherHitbox.GetLeftBound() &&
+		m_hitbox.GetLeftBound() < otherHitbox.GetRightBound();
+	bool collisionY = m_hitbox.GetBottomBound() > otherHitbox.GetTopBound() &&
+		m_hitbox.GetTopBound() < otherHitbox.GetBottomBound();
 
 	if (!collisionX || !collisionY)
 		return CollisionDirection::None;
 
-	if (m_hitbox.GetRightBound() > otherHitbox.GetLeftBound() && m_hitbox.GetLeftBound() < otherHitbox.GetLeftBound())
-		return CollisionDirection::Left;
+	float overlapLeft = m_hitbox.GetRightBound() - otherHitbox.GetLeftBound();
+	float overlapRight = otherHitbox.GetRightBound() - m_hitbox.GetLeftBound();
+	float overlapTop = m_hitbox.GetBottomBound() - otherHitbox.GetTopBound();
+	float overlapBottom = otherHitbox.GetBottomBound() - m_hitbox.GetTopBound();
 
-	if (m_hitbox.GetLeftBound() < otherHitbox.GetRightBound() && m_hitbox.GetRightBound() > otherHitbox.GetRightBound())
-		return CollisionDirection::Right;
+	float minOverlap = std::min({ overlapLeft, overlapRight, overlapTop, overlapBottom });
 
-	if (m_hitbox.GetBottomBound() > otherHitbox.GetTopBound() && m_hitbox.GetTopBound() < otherHitbox.GetTopBound())
+	if (minOverlap == overlapTop)
 		return CollisionDirection::Top;
-
-	if (m_hitbox.GetBottomBound() <= otherHitbox.GetTopBound() && m_hitbox.GetTopBound() < otherHitbox.GetTopBound())
+	if (minOverlap == overlapBottom)
 		return CollisionDirection::Bottom;
+	if (minOverlap == overlapLeft)
+		return CollisionDirection::Left;
+	if (minOverlap == overlapRight)
+		return CollisionDirection::Right;
 
 	return CollisionDirection::None;
 }
 
 void Player::ResolveCollision(const CollisionDirection& collisionDirection)
 {
-	std::clog << "RESOLVING COLLISION... ";
-
 	switch (collisionDirection)
 	{
-	case CollisionDirection::Left:
-		std::clog << "COLLISION DETECTED - LEFT\n";
-		m_position.x = m_hitbox.GetLeftBound();  // Snap player to the right of the obstacle
-		m_velocity.x = 0.0f;  // Stop horizontal movement
-		break;
-
 	case CollisionDirection::Top:
-		std::clog << "COLLISION DETECTED - TOP\n";
-		m_velocity.x = 0.0f;  // Stop vertical movement
-		m_position.y = m_hitbox.GetTopBound() + m_frameHeight;  // Snap below the obstacle
-		break;
-
-	case CollisionDirection::Right:
-		std::clog << "COLLISION DETECTED - RIGHT\n";
-		m_position.x = m_hitbox.GetRightBound() - m_frameWidth;  // Snap player to the left of the obstacle
-		m_velocity.x = 0.0f;  // Stop horizontal movement
+		m_velocity.y = 0.0f;
+		m_position.y = m_hitbox.GetTopBound() - m_frameHeight;
+		m_isOnGround = true;
 		break;
 
 	case CollisionDirection::Bottom:
-		std::clog << "COLLISION DETECTED - BOTTOM\n";
-		m_velocity.x = 0.0f;  // Stop vertical movement
-		m_position.y = m_hitbox.GetBottomBound() - m_frameHeight;  // Snap on top of the obstacle
+		m_velocity.y = 0.0f;
+		m_position.y = m_hitbox.GetBottomBound();
 		break;
 
-	default:
+	case CollisionDirection::Left:
+		m_velocity.x = 0.0f;
+		m_position.x = m_hitbox.GetLeftBound() - m_frameWidth;
+		break;
+
+	case CollisionDirection::Right:
+		m_velocity.x = 0.0f;
+		m_position.x = m_hitbox.GetRightBound();
 		break;
 	}
 }
