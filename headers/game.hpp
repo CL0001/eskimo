@@ -22,7 +22,7 @@ public:
 	void Render();
 
 private:
-	const int m_windowWidth = 1200;
+	const int m_windowWidth = 1200; 
 	const int m_windowHeight = 720;
 
 	std::shared_ptr<Tileset> m_tileset;

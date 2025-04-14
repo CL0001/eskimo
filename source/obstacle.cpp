@@ -1,7 +1,7 @@
 #include "obstacle.hpp"
 
 Obstacle::Obstacle(std::shared_ptr<Tileset> tileset, Vector2 tilesetPosition, Vector2 position)
-	: m_tileset(tileset), m_tilesetPosition(tilesetPosition), m_position(position)
+	: m_tileset(tileset), m_tilesetPosition(tilesetPosition), m_position(position), m_hitbox(m_position, TILE_SIZE, TILE_SIZE)
 {
 }
 

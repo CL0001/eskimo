@@ -44,7 +44,15 @@ void Level::HandlePlayerInput(const float deltaTime)
 
 void Level::HandleCollisions()
 {
+	for (const auto& obstacle : m_obstacleLayout)
+	{
+		CollisionDirection collisionDirection = m_player->CheckCollisionWith(obstacle.GetHitbox());
 
+		if (collisionDirection != CollisionDirection::None)
+		{
+			m_player->ResolveCollision(collisionDirection);
+		}
+	}
 }
 
 void Level::Draw()

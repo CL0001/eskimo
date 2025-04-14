@@ -40,11 +40,14 @@ public:
 
 	void Draw();
 
+	CollisionDirection CheckCollisionWith(const Hitbox& otherHitbox) const;
+	void ResolveCollision(const CollisionDirection& collisionDirection);
+
 	void SetAnimationState(AnimationAtlasMapper newState);
 
 private:
 	Vector2 m_position;
-	float m_verticalVelocity = 0;
+	Vector2 m_velocity;
 	bool m_isOnGround = false;
 	bool m_facingRight = true;
 

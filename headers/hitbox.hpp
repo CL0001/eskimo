@@ -23,8 +23,6 @@ public:
 	void Update(Vector2 position, float width, float height);
 	void Update(Vector2 position, float width, float height, bool isFacingRight);
 
-	static CollisionDirection CheckCollisionBetween(const Hitbox& hitbox1, const Hitbox& hitbox2);
-
 	float GetLeftBound() const;
 	float GetTopBound() const;
 	float GetRightBound() const;

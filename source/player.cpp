@@ -2,6 +2,7 @@
 
 Player::Player()
 	: m_position({ static_cast<float>(GetScreenWidth() / 2), static_cast<float>(GetScreenHeight() / 2) }),
+	m_velocity(Vector2{}),
 	m_spriteAnimationAtlas(LoadTexture((std::string(RESOURCES_PATH) + "sprites/Eskimo/Animations.png").c_str())),
 	m_currentAnimationState(AnimationAtlasMapper::Idle),
 	m_frameWidth(m_spriteAnimationAtlas.width / ANIMATION_FRAME_COUNT),
@@ -58,7 +59,7 @@ void Player::Jump(const float deltaTime)
 	if (!m_isOnGround)
 		return;
 
-	m_verticalVelocity = BASE_JUMP_STRENGTH;
+	m_velocity.x = BASE_JUMP_STRENGTH;
 	m_isOnGround = false;
 
 	SetAnimationState(AnimationAtlasMapper::Jump);
@@ -66,8 +67,8 @@ void Player::Jump(const float deltaTime)
 
 void Player::ApplyGravity(const float deltaTime)
 {
-	m_verticalVelocity += BASE_GRAVITY * deltaTime;
-	m_position.y += m_verticalVelocity * deltaTime;
+	m_velocity.x += BASE_GRAVITY * deltaTime;
+	m_position.y += m_velocity.x * deltaTime;
 }
 
 void Player::CheckGroundCollision()
@@ -75,7 +76,7 @@ void Player::CheckGroundCollision()
 	if (m_position.y + m_frameHeight >= GetScreenHeight())
 	{
 		m_position.y = GetScreenHeight() - m_frameHeight;
-		m_verticalVelocity = 0.0f;
+		m_velocity.x = 0.0f;
 		m_isOnGround = true;
 	}
 	else
@@ -135,6 +136,79 @@ void Player::Draw()
 		0.0f,
 		WHITE
 	);
+}
+
+CollisionDirection Player::CheckCollisionWith(const Hitbox& otherHitbox) const
+{
+
+	// Log the player's hitbox bounds
+	std::clog << "PLAYER: Left = " << m_hitbox.GetLeftBound()
+		<< ", Top = " << m_hitbox.GetTopBound()
+		<< ", Right = " << m_hitbox.GetRightBound()
+		<< ", Bottom = " << m_hitbox.GetBottomBound()
+		<< std::endl;
+
+	// Log the obstacle's hitbox bounds
+	std::clog << "OBSTACLE: Left = " << otherHitbox.GetLeftBound()
+		<< ", Top = " << otherHitbox.GetTopBound()
+		<< ", Right = " << otherHitbox.GetRightBound()
+		<< ", Bottom = " << otherHitbox.GetBottomBound()
+		<< std::endl;
+
+	bool collisionX = m_hitbox.GetRightBound() > otherHitbox.GetLeftBound() && m_hitbox.GetLeftBound() < otherHitbox.GetRightBound();
+	bool collisionY = m_hitbox.GetBottomBound() > otherHitbox.GetTopBound() && m_hitbox.GetTopBound() < otherHitbox.GetBottomBound();
+
+	if (!collisionX || !collisionY)
+		return CollisionDirection::None;
+
+	if (m_hitbox.GetRightBound() > otherHitbox.GetLeftBound() && m_hitbox.GetLeftBound() < otherHitbox.GetLeftBound())
+		return CollisionDirection::Left;
+
+	if (m_hitbox.GetLeftBound() < otherHitbox.GetRightBound() && m_hitbox.GetRightBound() > otherHitbox.GetRightBound())
+		return CollisionDirection::Right;
+
+	if (m_hitbox.GetBottomBound() > otherHitbox.GetTopBound() && m_hitbox.GetTopBound() < otherHitbox.GetTopBound())
+		return CollisionDirection::Top;
+
+	if (m_hitbox.GetBottomBound() <= otherHitbox.GetTopBound() && m_hitbox.GetTopBound() < otherHitbox.GetTopBound())
+		return CollisionDirection::Bottom;
+
+	return CollisionDirection::None;
+}
+
+void Player::ResolveCollision(const CollisionDirection& collisionDirection)
+{
+	std::clog << "RESOLVING COLLISION... ";
+
+	switch (collisionDirection)
+	{
+	case CollisionDirection::Left:
+		std::clog << "COLLISION DETECTED - LEFT\n";
+		m_position.x = m_hitbox.GetLeftBound();  // Snap player to the right of the obstacle
+		m_velocity.x = 0.0f;  // Stop horizontal movement
+		break;
+
+	case CollisionDirection::Top:
+		std::clog << "COLLISION DETECTED - TOP\n";
+		m_velocity.x = 0.0f;  // Stop vertical movement
+		m_position.y = m_hitbox.GetTopBound() + m_frameHeight;  // Snap below the obstacle
+		break;
+
+	case CollisionDirection::Right:
+		std::clog << "COLLISION DETECTED - RIGHT\n";
+		m_position.x = m_hitbox.GetRightBound() - m_frameWidth;  // Snap player to the left of the obstacle
+		m_velocity.x = 0.0f;  // Stop horizontal movement
+		break;
+
+	case CollisionDirection::Bottom:
+		std::clog << "COLLISION DETECTED - BOTTOM\n";
+		m_velocity.x = 0.0f;  // Stop vertical movement
+		m_position.y = m_hitbox.GetBottomBound() - m_frameHeight;  // Snap on top of the obstacle
+		break;
+
+	default:
+		break;
+	}
 }
 
 void Player::SetAnimationState(AnimationAtlasMapper newState)
